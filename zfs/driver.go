@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/clinta/go-zfs"
+	"github.com/clinta/go-zfs/cmd"
 	"github.com/docker/go-plugins-helpers/volume"
 	log "github.com/sirupsen/logrus"
 )
@@ -157,14 +158,18 @@ func (zd *ZfsDriver) Mount(req *volume.MountRequest) (*volume.MountResponse, err
 	if err != nil {
 		return nil, err
 	}
-
+	err = cmd.Mount(req.Name, nil)
+	if err != nil {
+		return nil, err
+	}
 	return &volume.MountResponse{Mountpoint: mp}, nil
 }
 
-//Unmount does nothing because a zfs dataset need not be unmounted
+//Unmount unmount zfs dataset
 func (zd *ZfsDriver) Unmount(req *volume.UnmountRequest) error {
 	log.WithField("Request", req).Debug("Unmount")
-	return nil
+	err := cmd.UnMount(req.Name, nil)
+	return err
 }
 
 //Capabilities sets the scope to local as this is a local only driver
