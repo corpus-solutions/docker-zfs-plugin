@@ -48,8 +48,11 @@ func (zd *ZfsDriver) Create(req *volume.CreateRequest) error {
 	if zfs.DatasetExists(req.Name) {
 		return fmt.Errorf("volume already exists")
 	}
-
-	_, err := zfs.CreateDatasetRecursive(req.Name, req.Options)
+	opts := req.Options
+	if _, ok := opts["canmount"]; !ok {
+		opts["canmount"] = "noauto"
+	}
+	_, err := zfs.CreateDatasetRecursive(req.Name, opts)
 	return err
 }
 
